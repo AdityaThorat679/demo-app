@@ -27,6 +27,5 @@ pipeline {
                 sh "kubectl apply -f deploy.yml"
             }            
         }
-        }
     }
 }
