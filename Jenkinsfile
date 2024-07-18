@@ -1,31 +1,42 @@
 pipeline {
     agent any
-
-    stages {
-        stage('Clone'){
+    
+    stages{
+        stage("Code"){
             steps {
-                sh "git clone https://github.com/sanket363/demo-app.git"
-        }
-        stage('Build') {
-            steps {
-                sh "docker build -t node-app:v1 ."
+                echo "Clone the code"
+                git url:"https://github.com/AdityaThorat679/demo-app.git", branch: "main"
             }
         }
-        stage('Pushing To DockerHub'){
+        stage("Bulid"){
             steps {
-                //dockerhub pushing steps
+                echo "Bulid the image"
+                sh "docker build -t nodeapp ."
             }
         }
-        stage('Test') {
+        stage("Push to DockerHub"){
             steps {
-                echo "Testing...."
+                withCredentials([usernamePassword(credentialsId:"dockerhub", passwordVariable:"dockerHubPass", usernameVariable:"dockerHubUser")]) {
+                     sh "docker tag nodeapp ${env.dockerHubUser}/nodeapp:v1"
+                     sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPass}"
+                     sh "docker push ${env.dockerHubUser}/nodeapp:v1"
+                }
             }
         }
-        stage('Deploy') {
-            dir(Eks-folder){
-            steps {
-                sh "kubectl apply -f deploy.yml"
-            }            
+        stage("Test"){
+            steps{
+                echo "Testing"
+            }
+        }
+        stage("Deploy"){
+                dir(Eks-folder){
+                steps{
+                 
+                     sh "kubectl apply -f deploy.yml"
+                    
+                }
+            }
+            
         }
     }
 }
