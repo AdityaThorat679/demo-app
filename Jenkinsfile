@@ -5,7 +5,7 @@ pipeline {
         stage("Code"){
             steps {
                 echo "Clone the code"
-                git url:"https://github.com/AdityaThorat679/demo-app.git", branch: "main"
+                git url:"https://github.com/AdityaThorat679/demo-app.git", branch: "Node"
             }
         }
         stage("Bulid"){
@@ -29,14 +29,12 @@ pipeline {
             }
         }
         stage("Deploy"){
-                dir(Eks-folder){
+                
                 steps{
-                 
-                     sh "kubectl apply -f deploy.yml"
-                    
+                     dir("Eks-folder"){
+                        sh "kubectl apply -f deploy.yml"
+                    }
                 }
             }
-            
         }
     }
-}
